@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Wikipedia-like page for me">
+    <title>My Wikipedia-like Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; display: flex; }
+        #toc { position: fixed; left: 10px; top: 20px; width: 250px; padding: 10px; border: 1px solid #ddd; background-color: #f9f9f9; max-height: 80vh; overflow-y: auto; }
+        #content { margin-left: 280px; width: calc(100% - 300px); }
+        
+        /* Distinct styles for h1, h2, and h3 headings */
+        h1 { font-size: 24px; margin: 30px 0 15px; color: #333; font-weight: bold; cursor: pointer;}
+        h2 { font-size: 20px; margin: 25px 0 10px; color: #444; font-weight: bold; cursor: pointer;}
+        h3 { font-size: 16px; margin: 20px 0 5px; color: #555; font-weight: normal; cursor: pointer; }
+
+        .content { margin: 10px 0 0 20px; display: none; }
+        .toc-item, .toc-item a { list-style: none; cursor: pointer; }
+        .toc-item a { text-decoration: none; color: inherit; }
+        .toc-item a:hover { text-decoration: underline; }
+        .dropdown-arrow { 
+            margin-right: 5px; 
+            border-bottom: 2px solid #333;
+            width: 10px; 
+            height: 10px; 
+            transform: rotate(-45deg); 
+            transition: transform 0.3s; 
+            cursor: pointer; 
+        }
+        .collapsed { transform: rotate(45deg); }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const headers = document.querySelectorAll("h1, h2, h3");
+            const toc = document.getElementById("toc");
+            let tocContent = "<strong>Table of Contents</strong><ul>";
+            let sectionCounters = [0, 0, 0];
+
+            headers.forEach((header, index) => {
+                if (header.textContent.trim() === "My Wikipedia-like Page") return;
+
+                const level = parseInt(header.tagName.substring(1)) - 1;
+                sectionCounters[level]++;
+                for (let i = level + 1; i < sectionCounters.length; i++) sectionCounters[i] = 0;
+
+                const sectionNumber = sectionCounters.slice(0, level + 1).join(".");
+                header.id = `section${index}`;
+
+                if (level === 0) {
+                    tocContent += `<li class="toc-item"><span class="dropdown-arrow" data-target="${header.id}"></span><a href="#${header.id}">${sectionNumber} ${header.innerText}</a>`;
+                } else {
+                    tocContent += `<li class="toc-item" style="margin-left: 20px;"><span class="dropdown-arrow" data-target="${header.id}"></span><a href="#${header.id}">${sectionNumber} ${header.innerText}</a>`;
+                }
+                
+                if (level < 2) {
+                    tocContent += `<ul style="display: none;"></ul>`;
+                }
+                
+                tocContent += `</li>`;
+
+                header.addEventListener("click", () => {
+                    const content = header.nextElementSibling;
+                    if (content) content.style.display = content.style.display === "none" ? "block" : "none";
+                });
+            });
+
+            toc.innerHTML = tocContent + "</ul>";
+
+            document.querySelectorAll(".dropdown-arrow").forEach(arrow => {
+                arrow.addEventListener("click", (event) => {
+                    const nestedList = arrow.parentElement.querySelector("ul");
+                    if (nestedList) {
+                        nestedList.style.display = nestedList.style.display === "none" ? "block" : "none";
+                    }
+                    arrow.classList.toggle("collapsed");
+                    event.preventDefault();
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="toc"></div>
+    <div id="content">
+        <h1>My Wikipedia-like Page</h1>
+        <section>
+            <h1>Early Life</h1>
+            <div class="content">
+                <p>I was born in Kolkata and did most of my schooling from Asansol, West Bengal.</p>
+            </div>
+        </section>
+        <section>
+            <h1>Career</h1>
+            <div class="content">
+                <h2>Schooling</h2>
+                <div class="content">
+                    <p>Completed class 10 from Asansol and 12 from Kolkata.</p>
+                </div>
+                <h2>Undergraduate</h2>
+                <div class="content">
+                    <p>Cleared JEE Main 2022 and JEE Advanced 2022 and got into IIT (ISM) Dhanbad for pursuing a bachelor of technology.</p>
+                </div>
+            </div>
+        </section>
+        <section>
+            <h1>Programmes</h1>
+            <div class="content">
+                <p>Part of the 5th cohort of the WE Programme by TalentSprint and supported by Google.</p>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
